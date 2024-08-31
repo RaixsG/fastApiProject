@@ -1,8 +1,10 @@
+from fastapi.encoders import jsonable_encoder
+from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
+
 from .models import ModelTask, ModelCategory, ModelUser
 from .schemas import TaskSchema, CreateUserSchema, CreateCategorySchema
-
-from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 
 from config.pagination import paginate, PageParams
 

@@ -33,8 +33,8 @@ class TaskSchema(BaseModel):
     name: str
     description: Optional[str] | None = Field(default="Sin Descripción", max_length=100)
     status: StatusType
-    category: Category
-    user: User
+    category: int
+    user: int
     # tags: List[str] = [] # Es una lista de elementos
     # tags: set[str] | None = set() # Es una lista de elementos únicos, si se repite un elemento, solo se guarda una vez
     
@@ -58,7 +58,7 @@ class TaskSchema(BaseModel):
                         "email": "test@tes.com",
                         "website": "https://www.user1.com"
                     },
-                    "tags": ["tag1", "tag2"]
+                    # "tags": ["tag1", "tag2"]
                 },
             ]
         }

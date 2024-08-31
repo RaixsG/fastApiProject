@@ -1,35 +1,50 @@
-from fastapi import FastAPI, Query, Path, Request, HTTPException, Depends
+import time
+from fastapi import FastAPI, Query, Depends, Request
 from fastapi.responses import JSONResponse
-from fastapi.security import HTTPBearer
-from task import router
-# from upload_file.router import router as upload_router
+from apps.tasks.routers import router_tasks
+from fastapi.middleware.cors import CORSMiddleware
 
 from pydantic import BaseModel
 
-from config.jwt_manager import create_token, validate_token
+from config.jwt_manager import create_token
+from middlewares.error_handler import ErrorHandler
+from middlewares.jwt_bearer import JWTBearer
 
 app = FastAPI()
-
-class JWTBearer(HTTPBearer):
-    async def __call__(self, request: Request):
-        auth = await super().__call__(request)
-        data = validate_token(auth.credentials)
-        if data['name'] != "admin":
-            raise HTTPException(status_code=401, detail="Unauthorized")
-
-class User(BaseModel):
-    name: str
-    password: str
-
 #Para cambiar el nombre de la aplicacion
 app.title = "Practica con FastAPI"
 #Para cambiar la version de la aplicacion
 app.version = "0.0.1"
 
+app.add_middleware(ErrorHandler)
+origins = [
+    "http://localhost.*.com",
+    "https://localhost.*.com",
+    "http://localhost",
+    "http://localhost:8000",
+]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins, # Una lista de orígenes a los que se les debe permitir realizar solicitudes de origen cruzado. P. ej... Se puede utilizar para permitir cualquier origen.['https://example.org', 'https://www.example.org']['*']
+    allow_credentials=True, #  Indicar que las cookies deben ser compatibles con las solicitudes de origen cruzado. El valor predeterminado es . Además, no se puede establecer en para que se permitan las credenciales, se deben especificar los orígenes.Falseallow_origins['*']
+    allow_methods=["*"], # Una lista de métodos HTTP que deben permitirse para solicitudes de origen cruzado. El valor predeterminado es . Puede usar para permitir todos los métodos estándar.['GET']['*']
+    allow_headers=["*"], # Una lista de encabezados de solicitud HTTP que deben ser compatibles con las solicitudes de origen cruzado. El valor predeterminado es . Puede usar para permitir todos los encabezados. Los encabezados , , y siempre están permitidos para []['*']
+)
+@app.middleware("http")
+async def add_process_time_header(request: Request, call_next):
+    start_time = time.perf_counter()
+    response = await call_next(request)
+    process_time = time.perf_counter() - start_time
+    response.headers["X-Process-Time"] = str(process_time)
+    return response
 
-app.include_router(router, prefix='/api/tasks')
-# app.include_router(upload_router, prefix='/upload_file')
 
+
+app.include_router(router_tasks, prefix='/api/tasks')
+
+class User(BaseModel):
+    name: str
+    password: str
 
 @app.get("/test-query", dependencies=[Depends(JWTBearer())])
 def page(page: int = Query(1, gt=1, lt=20), size: int = Query(5, ge=5, le=10)):
@@ -57,13 +72,3 @@ def login(user: User):
         "message": "Login Failed"
     }, status_code=401)
     
-
-
-#@app.get("/")
-#async def root():
-#    return {"message": "Hello World"}
-#
-#
-#@app.get("/hello/{name}")
-#async def say_hello(name: str):
-#    return {"message": f"Hello {name}"}
