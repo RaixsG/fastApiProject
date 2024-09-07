@@ -57,6 +57,7 @@ def page(page: int = Query(1, gt=1, lt=20), size: int = Query(5, ge=5, le=10)):
 def page(page: int): #ge significa que el valor debe ser mayor o igual a 1, le significa que el valor debe ser menor o igual a 20
     return JSONResponse(content={
         "page": page
+        # "settings": settings.model_dump_json()
     }, status_code=404)
 
 
