@@ -21,7 +21,7 @@ class ModelTask(Base):
     category = Column(Integer, ForeignKey('categories.id'), nullable=False)
     user = Column(Integer, ForeignKey('users.id'), nullable=False)
     
-    # fk_category = relationship("ModelCategory", joined)
+    fk_category = relationship("ModelCategory", lazy="joined")
 
 class ModelUser(Base):
     __tablename__ = "users"

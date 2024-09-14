@@ -18,6 +18,9 @@ def get_all_tasks(page: int, size: int, db: Session = Depends(get_database_sessi
 # Lo que se agrega en la ruta, son PARAMETROS para realizar filtrados
 @router_tasks.get('/unique/{id}', status_code=status.HTTP_200_OK, tags=['Tasks'])
 def get(id: int, db: Session = Depends(get_database_session)):
+    # response = crud.getByIdTask(db, id)
+    # print(response.fk_category.id)
+    # return response
     return crud.getByIdTask(db, id)
 
 # Los parametros QUERY y no se agregar en la ruta, van directo en la funcion, se pueden usar como

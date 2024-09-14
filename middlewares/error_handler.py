@@ -18,9 +18,3 @@ class ErrorHandler(BaseHTTPMiddleware):
             # return await super().dispatch(request, call_next)
             return JSONResponse(status_code=500, content={"message": f"Internal Server Error: {str(e)}"})
 
-
-
-
-
-
-
