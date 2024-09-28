@@ -1,14 +1,15 @@
 import time
 from fastapi import FastAPI, Query, Depends, Request
 from fastapi.responses import JSONResponse
-from apps.tasks.routers import router_tasks
 from fastapi.middleware.cors import CORSMiddleware
-
 from pydantic import BaseModel
 
 from config.jwt_manager import create_token
 from middlewares.error_handler import ErrorHandler
 from middlewares.jwt_bearer import JWTBearer
+
+from apps.tasks.routers import router_tasks
+from upload_file.router import routers as upload_file_router
 
 app = FastAPI()
 #Para cambiar el nombre de la aplicacion
@@ -41,24 +42,25 @@ async def add_process_time_header(request: Request, call_next):
 
 
 app.include_router(router_tasks, prefix='/api/tasks')
+app.include_router(upload_file_router, prefix='/api/images')
 
 class User(BaseModel):
     name: str
     password: str
 
-@app.get("/test-query", dependencies=[Depends(JWTBearer())])
-def page(page: int = Query(1, gt=1, lt=20), size: int = Query(5, ge=5, le=10)):
-    return JSONResponse(content={
-        "page": page,
-        "size": size
-    })
+# @app.get("/test-query", dependencies=[Depends(JWTBearer())])
+# def page(page: int = Query(1, gt=1, lt=20), size: int = Query(5, ge=5, le=10)):
+#     return JSONResponse(content={
+#         "page": page,
+#         "size": size
+#     })
     
-@app.get("/test-path/{page}")
-def page(page: int): #ge significa que el valor debe ser mayor o igual a 1, le significa que el valor debe ser menor o igual a 20
-    return JSONResponse(content={
-        "page": page
-        # "settings": settings.model_dump_json()
-    }, status_code=404)
+# @app.get("/test-path/{page}")
+# def page(page: int): #ge significa que el valor debe ser mayor o igual a 1, le significa que el valor debe ser menor o igual a 20
+#     return JSONResponse(content={
+#         "page": page
+#         # "settings": settings.model_dump_json()
+#     }, status_code=404)
 
 
 @app.post("/login/", tags=["Login"])
