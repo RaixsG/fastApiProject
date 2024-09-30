@@ -11,6 +11,8 @@ from alembic import context
 from config.db import Base
 # from config.config import settings
 
+from apps.tasks.models import ModelTask, ModelCategory, ModelUser
+
 
 config = context.config
 config.set_main_option("sqlalchemy.url", os.getenv("DATABASE_URL"))
