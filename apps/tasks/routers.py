@@ -1,4 +1,4 @@
-from fastapi import APIRouter, status, Depends
+from fastapi import APIRouter, Request, status, Depends
 from sqlalchemy.orm import Session
 
 from config.db import Base, engine, get_database_session
@@ -12,16 +12,13 @@ Base.metadata.create_all(bind=engine)
 router_tasks = APIRouter()
 
 @router_tasks.get('/list', status_code=status.HTTP_200_OK, tags=['Tasks'], response_model=PagedResponseSchema)
-def get_all_tasks(page: int, size: int, db: Session = Depends(get_database_session)):
-    return crud.pagination(page, size, db)
+def get_all_tasks(request: Request, page: int = 1, size: int = 25, db: Session = Depends(get_database_session)):
+    return crud.pagination(page, size, db, request)
 
 # Lo que se agrega en la ruta, son PARAMETROS para realizar filtrados
 @router_tasks.get('/unique/{id}', status_code=status.HTTP_200_OK, tags=['Tasks'])
-def get(id: int, db: Session = Depends(get_database_session)):
-    # response = crud.getByIdTask(db, id)
-    # print(response.fk_category.id)
-    # return response
-    return crud.getByIdTask(db, id)
+def get(id: int, request: Request, db: Session = Depends(get_database_session)):
+    return crud.getByIdTask(db, id, request)
 
 # Los parametros QUERY y no se agregar en la ruta, van directo en la funcion, se pueden usar como
 # @router_tasks.get('/unique/', status_code=status.HTTP_200_OK, tags=['Tasks'])
@@ -30,23 +27,17 @@ def get(id: int, db: Session = Depends(get_database_session)):
 
 
 @router_tasks.post('/create_task/', status_code=status.HTTP_201_CREATED, tags=['Tasks'])
-def post(task: TaskCreateSchema, db: Session = Depends(get_database_session)):
-    instance = crud.createTask(task, db)
-    return {
-        'task': instance
-    }
+def post(task: TaskCreateSchema, request: Request, db: Session = Depends(get_database_session)):
+    return crud.createTask(task, db, request)
 
 @router_tasks.put('/update/{id}', status_code=status.HTTP_200_OK, tags=['Tasks'])
-def update(id: int, task: TaskCreateSchema, db: Session = Depends(get_database_session)):
-    instance = crud.updateTask(id, task, db)
-    return {
-        instance
-    }
+def update(id: int, task: TaskCreateSchema, request: Request,  db: Session = Depends(get_database_session)):
+    return crud.updateTask(id, task, db, request)
+    
 
 @router_tasks.delete('/delete/{id}', status_code=status.HTTP_200_OK, tags=['Tasks'])
 def delete(id: int, db: Session = Depends(get_database_session)):
-    response =  crud.deleteTask(id, db)
-    return  response
+    return crud.deleteTask(id, db)
 
 
 # Routes Categories

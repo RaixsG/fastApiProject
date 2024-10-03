@@ -15,11 +15,12 @@ class ModelTask(Base):
     __tablename__ = "tasks"
     
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String(50), unique=True)
+    name = Column(String(50))
     description = Column(Text)
     status = Column(Enum(StatusType))
     category = Column(Integer, ForeignKey('categories.id'), nullable=False)
     user = Column(Integer, ForeignKey('users.id'), nullable=False)
+    image = Column(String)
     
     fk_category = relationship("ModelCategory", lazy="joined")
 

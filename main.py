@@ -1,17 +1,20 @@
 import time
 from fastapi import FastAPI, Query, Depends, Request
+from fastapi.staticfiles import StaticFiles
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 from config.jwt_manager import create_token
 from middlewares.error_handler import ErrorHandler
-from middlewares.jwt_bearer import JWTBearer
 
 from apps.tasks.routers import router_tasks
 from upload_file.router import routers as upload_file_router
 
 app = FastAPI()
+
+# Montar la carpeta `assets` para servir archivos estáticos
+app.mount("/static", StaticFiles(directory="assets"), name="static")
 #Para cambiar el nombre de la aplicacion
 app.title = "Practica con FastAPI"
 #Para cambiar la version de la aplicacion
