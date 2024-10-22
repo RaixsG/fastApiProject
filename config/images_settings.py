@@ -11,7 +11,7 @@ ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 ALLOWED_EXTENSIONS = {"JPEG", "JPG", "PNG"}
 
-MAX_IMAGE_SIZE = 1 * 1024 * 1024  # 1MB
+MAX_IMAGE_SIZE = 5 * 1024 * 1024  # 1MB
 
 def generate_unique_image_name(name: str) -> str:
     """Genera un nombre único para la imagen usando UUID."""
@@ -36,7 +36,7 @@ def fix_base64_padding(b64_string: str) -> str:
         b64_string += '=' * (4 - missing_padding)
     return b64_string
 
-def save_image_base64(image_base64: str, name: str, folder: str = "assets/", new_size: tuple = (800, 800)) -> str:
+def save_image_base64(image_base64: str, name: str, folder: str = "assets/", new_size: tuple = (1920, 1080)) -> str:
 
     # Remover encabezado de base64 si existe
     image_base64 = remove_base64_header(image_base64)
@@ -65,10 +65,11 @@ def save_image_base64(image_base64: str, name: str, folder: str = "assets/", new
     os.makedirs(folder, exist_ok=True)
 
     # Guardar la imagen con un nombre amigable
-    image_name = f"{slugify(name)}.jpeg"
+    image_name = f"{slugify(name)}.webp"
     image_path = os.path.join(folder, image_name)
 
     # Guardar imagen en formato JPEG
-    image.save(image_path, format="JPEG", optimize=True)
+    # image.save(image_path, format="JPEG", optimize=True)
+    image.save(image_path, format="WEBP", quality=60, method=4)
 
     return image_path  # Devolvemos la ruta donde se guardó la imagen
